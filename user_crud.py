@@ -1,7 +1,10 @@
 from pony import orm
 
+import logger
 from models import User
 from settings import DEFAULT_TOPIC
+
+log = logger.get_logger('User CRUD')
 
 
 @orm.db_session
@@ -11,7 +14,9 @@ def get(user_id: int) -> User:
 
 @orm.db_session
 def create(user_id: int, topic: str = DEFAULT_TOPIC) -> User:
-    return User(id=user_id, current_topic=topic)
+    user = User(id=user_id, current_topic=topic)
+    log.debug(f'User was created[{user.id}]')
+    return user
 
 
 @orm.db_session

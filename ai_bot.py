@@ -8,6 +8,8 @@ import bs4 as bs
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+import logger
+
 
 class AIBot:
 
@@ -22,16 +24,26 @@ class AIBot:
     def __init__(self, subject: str):
         self.subject = subject
         self.wnlemmatizer = nltk.stem.WordNetLemmatizer()
+        self.log = logger.get_logger('AI bot')
 
     def run_bot(self):
         while True:
-            user_input =  input('Ask me something: ')
+            user_input = input('Ask me something: ')
             if user_input in self.STOP_WORDS:
                 break
             print(f'Answer: {self.generate_response(user_input)}')
 
     def fetch_wiki_text(self) -> str:
-        response = requests.get(f'{self.WIKI_API}/{self.subject}')
+        url = f'{self.WIKI_API}/{self.subject}'
+
+        self.log.debug(f'sending request to {url}.')
+
+        response = requests.get(url)
+        if response.status_code == 200:
+            self.log.debug(f'Got successfully response: {response}.')
+        else:
+            self.log.warning(f'Got bad response: {response}.')
+
         raw_html = response.text
 
         article_html = bs.BeautifulSoup(raw_html, 'html.parser')
@@ -56,6 +68,7 @@ class AIBot:
         article_text = self.fetch_wiki_text()
         article_sentence, article_words = self.split_text(article_text)
         sentences = [*article_sentence, user_input]
+        self.log.debug(f'Bot started generating response: {user_input}')
 
         word_vectorizer = TfidfVectorizer(
             tokenizer=self._get_processed_text,
@@ -71,8 +84,10 @@ class AIBot:
         vector_matched = matched_vector[-2]
 
         if vector_matched == 0:
+            self.log.debug(f'Bot could not find answer: {user_input}')
             return "I'm sorry, I could not understand you."
         else:
+            self.log.debug(f'Bot answered on: {user_input}')
             return article_sentence[similar_sentence_number]
 
     def _perform_lemmatization(self, tokens: Iterable[str]) -> List[str]:
