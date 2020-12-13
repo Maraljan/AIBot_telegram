@@ -1,5 +1,6 @@
 import random
 
+import nltk
 from telegram import Update
 from telegram.ext.filters import Filters
 from telegram.ext import (Updater, CommandHandler, CallbackContext,
@@ -61,6 +62,11 @@ def start_change_topic(update: Update, context: CallbackContext):
     return CHANGE_TOPIC
 
 
+def _download_nltk_resources():
+    nltk.download('punkt')
+    nltk.download('wordnet')
+
+
 def change_topic(update: Update, context: CallbackContext) -> None:
     user = user_crud.get_or_create(update.effective_user.id)
     topic = update.message.text
@@ -93,6 +99,7 @@ updater.dispatcher.add_handler(MessageHandler(Filters.text, get_bot_response))
 
 
 if __name__ == '__main__':
+    _download_nltk_resources()
     logger.logger_config(level='DEBUG', root_level='WARNING')
 
     log.info('Bot has been started... \n Press ctrl + C to STOP the bot')
