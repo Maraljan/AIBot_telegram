@@ -52,7 +52,6 @@ class AIBot:
 
         article_html = bs.BeautifulSoup(raw_html, 'html.parser')
         article_paragraphs = article_html.select('h2, p')
-        # article_text = ''.join(p.text for p in article_paragraphs).lower()
         # add content tags
 
         article_text = ''
@@ -60,7 +59,7 @@ class AIBot:
 
         for tag in article_paragraphs:  # type: Tag
             if tag.name == 'h2':
-                current_header = self.split_text(tag.text)
+                current_header = self._remove_tag(tag.text)
             else:
                 sentences, _ = self.split_text(tag.text)
                 article_text += ''.join(f'[{current_header}] {sentence}' for sentence in sentences)
@@ -119,7 +118,7 @@ class AIBot:
     def _filter_sentences(self, similarly_vector: np.ndarray) -> Generator[Tuple[int, float], None, None]:
         similarly_vector_indexed = sorted(enumerate(similarly_vector), key=itemgetter(1), reverse=True)
         for index, similarity in similarly_vector_indexed[1:]:
-            if similarity > self.SENTENCE_THRESHOLD:
+            if similarity >= self.SENTENCE_THRESHOLD:
                 yield index, similarity
 
     @staticmethod
@@ -130,6 +129,6 @@ class AIBot:
 
 
 if __name__ == '__main__':
-    bot = AIBot('A*_ search_algorithm')
+    bot = AIBot('A*_search_algorithm')
     # print(bot.generate_response('algorithm'))
     bot.run_bot()
