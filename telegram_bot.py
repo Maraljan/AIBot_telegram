@@ -7,7 +7,7 @@ from telegram.ext import (Updater, CommandHandler, CallbackContext,
 import logger
 import user_crud
 from ai_bot import AIBot
-from settings import TOKEN, DEFAULT_TOPIC
+from settings import TOKEN
 
 CHANGE_TOPIC = 1
 
