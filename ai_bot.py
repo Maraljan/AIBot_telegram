@@ -38,6 +38,7 @@ class AIBot:
             print(f'Answer: {self.generate_response(user_input)}')
 
     def fetch_wiki_text(self) -> str:
+
         url = f'{self.WIKI_API}/{self.subject}'
 
         self.log.debug(f'sending request to {url}.')
@@ -98,7 +99,7 @@ class AIBot:
         matched_vectors = list(self._filter_sentences(similarly_vector))[:self.MATCHED_LIMIT]
 
         if matched_vectors:
-            response = ' '.join(self._remove_tag(article_sentence[idx]) for idx, _ in matched_vectors)
+            response = ' '.join(self._remove_tag(sentences[idx]) for idx, _ in matched_vectors)
             self.log.debug(f'Successfully generated response. Found {len(matched_vectors)} for response.')
 
         else:
