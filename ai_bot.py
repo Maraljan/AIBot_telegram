@@ -119,7 +119,7 @@ class AIBot:
     def _filter_sentences(self, similarly_vector: np.ndarray) -> Generator[Tuple[int, float], None, None]:
         similarly_vector_indexed = sorted(enumerate(similarly_vector), key=itemgetter(1), reverse=True)
         for index, similarity in similarly_vector_indexed[1:]:
-            if similarity >= self.SENTENCE_THRESHOLD:
+            if similarity > self.SENTENCE_THRESHOLD:
                 yield index, similarity
 
     @staticmethod
